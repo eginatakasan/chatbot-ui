@@ -5,6 +5,7 @@ import { useTranslation } from 'next-i18next';
 
 import HomeContext from '@/pages/api/home/home.context';
 
+import { PdfUpload } from '@/components/Settings/Pdf';
 import { SettingDialog } from '@/components/Settings/SettingDialog';
 
 import { Import } from '../../Settings/Import';
@@ -34,6 +35,7 @@ export const ChatbarSettings = () => {
     handleImportConversations,
     handleExportData,
     handleApiKeyChange,
+    handleUploadPdf,
   } = useContext(ChatbarContext);
 
   return (
@@ -41,6 +43,8 @@ export const ChatbarSettings = () => {
       {conversations.length > 0 ? (
         <ClearConversations onClearConversations={handleClearConversations} />
       ) : null}
+
+      <PdfUpload onImport={handleUploadPdf} />
 
       <Import onImport={handleImportConversations} />
 

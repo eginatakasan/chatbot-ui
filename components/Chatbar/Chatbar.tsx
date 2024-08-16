@@ -24,6 +24,7 @@ import Sidebar from '../Sidebar';
 import ChatbarContext from './Chatbar.context';
 import { ChatbarInitialState, initialState } from './Chatbar.state';
 
+import { env } from 'process';
 import { v4 as uuidv4 } from 'uuid';
 
 export const Chatbar = () => {
@@ -186,6 +187,13 @@ export const Chatbar = () => {
     }
   };
 
+  const handleUploadPdf = async (formData: FormData) => {
+    console.log(process.env.NEXT_SERVER_URL);
+    var request = new XMLHttpRequest();
+    request.open('POST', `${process.env.NEXT_SERVER_URL}/upload-pdfs/`);
+    request.send(formData);
+  };
+
   useEffect(() => {
     if (searchTerm) {
       chatDispatch({
@@ -217,6 +225,7 @@ export const Chatbar = () => {
         handlePluginKeyChange,
         handleClearPluginKey,
         handleApiKeyChange,
+        handleUploadPdf,
       }}
     >
       <Sidebar<Conversation>

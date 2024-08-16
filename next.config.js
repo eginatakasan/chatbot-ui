@@ -9,6 +9,7 @@ if (pathPrefix && !pathPrefix.startsWith('/')) {
 const nextConfig = {
   env: {
     PATH_PREFIX: pathPrefix,
+    NEXT_SERVER_URL: 'http://localhost:8080'
   },
   basePath: pathPrefix,
   assetPrefix: pathPrefix,
