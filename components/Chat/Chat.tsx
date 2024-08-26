@@ -29,10 +29,10 @@ import Spinner from '../Spinner';
 import { ChatInput } from './ChatInput';
 import { ChatLoader } from './ChatLoader';
 import { ErrorMessageDiv } from './ErrorMessageDiv';
+import { MemoizedChatMessage } from './MemoizedChatMessage';
 import { ModelSelect } from './ModelSelect';
 import { SystemPrompt } from './SystemPrompt';
 import { TemperatureSlider } from './Temperature';
-import { MemoizedChatMessage } from './MemoizedChatMessage';
 
 interface Props {
   stopConversationRef: MutableRefObject<boolean>;
@@ -93,36 +93,37 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
         });
         homeDispatch({ field: 'loading', value: true });
         homeDispatch({ field: 'messageIsStreaming', value: true });
-        const chatBody: ChatBody = {
-          model: updatedConversation.model,
-          messages: updatedConversation.messages,
-          key: apiKey,
-          prompt: updatedConversation.prompt,
-          temperature: updatedConversation.temperature,
-        };
-        const endpoint = getEndpoint(plugin);
-        let body;
-        if (!plugin) {
-          body = JSON.stringify(chatBody);
-        } else {
-          body = JSON.stringify({
-            ...chatBody,
-            googleAPIKey: pluginKeys
-              .find((key) => key.pluginId === 'google-search')
-              ?.requiredKeys.find((key) => key.key === 'GOOGLE_API_KEY')?.value,
-            googleCSEId: pluginKeys
-              .find((key) => key.pluginId === 'google-search')
-              ?.requiredKeys.find((key) => key.key === 'GOOGLE_CSE_ID')?.value,
-          });
-        }
+        // const chatBody: ChatBody = {
+        //   model: updatedConversation.model,
+        //   messages: updatedConversation.messages,
+        //   key: apiKey,
+        //   prompt: updatedConversation.prompt,
+        //   temperature: updatedConversation.temperature,
+        // };
+        // const endpoint = getEndpoint(plugin);
+        // let body;
+        // if (!plugin) {
+        //   body = JSON.stringify(chatBody);
+        // } else {
+        //   body = JSON.stringify({
+        //     ...chatBody,
+        //     googleAPIKey: pluginKeys
+        //       .find((key) => key.pluginId === 'google-search')
+        //       ?.requiredKeys.find((key) => key.key === 'GOOGLE_API_KEY')?.value,
+        //     googleCSEId: pluginKeys
+        //       .find((key) => key.pluginId === 'google-search')
+        //       ?.requiredKeys.find((key) => key.key === 'GOOGLE_CSE_ID')?.value,
+        //   });
+        // }
         const controller = new AbortController();
-        const response = await fetch(endpoint, {
-          method: 'POST',
+        const response = await fetch(`${process.env.NEXT_SERVER_URL}/chat`, {
           headers: {
             'Content-Type': 'application/json',
           },
-          signal: controller.signal,
-          body,
+          method: 'POST',
+          body: JSON.stringify({
+            user_input: `My user id is diego-98, ${message.content}`,
+          }),
         });
         if (!response.ok) {
           homeDispatch({ field: 'loading', value: false });
@@ -245,13 +246,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
         }
       }
     },
-    [
-      apiKey,
-      conversations,
-      pluginKeys,
-      selectedConversation,
-      stopConversationRef,
-    ],
+    [conversations, homeDispatch, selectedConversation, stopConversationRef],
   );
 
   const scrollToBottom = useCallback(() => {

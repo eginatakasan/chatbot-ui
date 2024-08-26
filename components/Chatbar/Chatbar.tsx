@@ -9,7 +9,7 @@ import { saveConversation, saveConversations } from '@/utils/app/conversation';
 import { saveFolders } from '@/utils/app/folders';
 import { exportData, importData } from '@/utils/app/importExport';
 
-import { Conversation } from '@/types/chat';
+import { Conversation, Message } from '@/types/chat';
 import { LatestExportFormat, SupportedExportFormats } from '@/types/export';
 import { OpenAIModels } from '@/types/openai';
 import { PluginKey } from '@/types/plugin';
@@ -188,8 +188,28 @@ export const Chatbar = () => {
   };
 
   const handleUploadPdf = async (formData: FormData) => {
-    console.log(process.env.NEXT_SERVER_URL);
     var request = new XMLHttpRequest();
+    request.onreadystatechange = function () {
+      if (request.readyState == XMLHttpRequest.DONE) {
+        const message: Message = {
+          content: request.responseText,
+          role: 'assistant',
+        };
+        defaultModelId &&
+          homeDispatch({
+            field: 'selectedConversation',
+            value: {
+              id: uuidv4(),
+              name: t('New Conversation'),
+              messages: [message],
+              model: OpenAIModels[defaultModelId],
+              prompt: DEFAULT_SYSTEM_PROMPT,
+              temperature: DEFAULT_TEMPERATURE,
+              folderId: null,
+            },
+          });
+      }
+    };
     request.open('POST', `${process.env.NEXT_SERVER_URL}/upload-pdfs/`);
     request.send(formData);
   };

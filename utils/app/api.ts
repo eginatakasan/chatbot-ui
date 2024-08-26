@@ -4,11 +4,15 @@ export const getEndpoint = (plugin: Plugin | null) => {
   let pathPrefix = process.env.PATH_PREFIX || '';
   if (pathPrefix && pathPrefix.startsWith('/')) {
     pathPrefix = pathPrefix.substring(1);
-    pathPrefix = pathPrefix.substring(pathPrefix.indexOf("/") + 1);
+    pathPrefix = pathPrefix.substring(pathPrefix.indexOf('/') + 1);
   }
 
   if (!plugin) {
     return `${pathPrefix}/api/chat`;
+  }
+
+  if (plugin.id === PluginID.BRIEFLY) {
+    return `${process.env.API_URL || ''}`;
   }
 
   if (plugin.id === PluginID.GOOGLE_SEARCH) {
